@@ -45,7 +45,7 @@ bool isPrintable(const std::uint32_t codepoint);
 
 void printSymbols(const std::vector<CodePoint> &symbols);
 void printErrors(const std::vector<Error> &errors);
-void printTypes(const std::vector<CodePoint> &symbols);
+void printSummary(const std::vector<CodePoint> &symbols, std::size_t totalBytes, int totalErrors);
 
 int main(int argc, char *argv[])
 {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl << ">> Errors: " << std::endl;
     printErrors(dr.errors);
 
-    printTypes(dr.symbols);
+    printSummary(dr.symbols, buffer->size(), static_cast<int>(dr.errors.size()));
 
     return 0;
 }
@@ -261,7 +261,7 @@ void printSymbols(const std::vector<CodePoint> &symbols)
     }
 }
 
-void printTypes(const std::vector<CodePoint> &symbols)
+void printSummary(const std::vector<CodePoint> &symbols, std::size_t totalBytes, int totalErrors)
 {
     int b1 = 0, b2 = 0, b3 = 0, b4 = 0;
 
@@ -269,6 +269,7 @@ void printTypes(const std::vector<CodePoint> &symbols)
     {
         switch (codep.type)
         {
+
         case CodePointType::ONE_BYTE:
             b1++;
             break;
@@ -281,16 +282,18 @@ void printTypes(const std::vector<CodePoint> &symbols)
         case CodePointType::FOUR_BYTE:
             b4++;
             break;
-        deafult:
+        default:
             break;
         }
     }
 
-    int total = b1 + b2 + b3 + b4;
+    int totalValid = b1 + b2 + b3 + b4;
 
-    std::cout << std::format("\nTOTAL BYTES: {}\n", total);
+    std::cout << std::format("\nTOTAL BYTES: {}\n", totalBytes);
+    std::cout << std::format("Valid Code Points: {}\n", totalValid);
+    std::cout << std::format("Total amount of errors: {}\n", totalErrors);
 
-    std::cout << std::format("1 byte\t{}\n", b1);
+    std::cout << std::format("\n1 byte\t{}\n", b1);
     std::cout << std::format("2 byte\t{}\n", b2);
     std::cout << std::format("3 byte\t{}\n", b3);
     std::cout << std::format("4 byte\t{}\n", b4);
