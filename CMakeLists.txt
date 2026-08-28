@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(utf8-decoder
     src/main.cpp
+    src/decoder.cpp
 )
 
 target_include_directories(utf8-decoder PRIVATE
