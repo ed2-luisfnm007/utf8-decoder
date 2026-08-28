@@ -44,6 +44,8 @@ bool isTrailByte(const std::uint8_t byte);
 bool isPrintable(const std::uint32_t codepoint);
 
 void printSymbols(const std::vector<CodePoint> &symbols);
+void printErrors(const std::vector<Error> &errors);
+void printTypes(const std::vector<CodePoint> &symbols);
 
 int main(int argc, char *argv[])
 {
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
 
     auto buffer = read(path);
 
-    if(!buffer)
+    if (!buffer)
     {
         std::cerr << "Error: No se pudo leer el archivo." << std::endl;
         return 1;
@@ -66,7 +68,14 @@ int main(int argc, char *argv[])
 
     DecodeResult dr = decode(buffer.value());
 
+    std::cout << ">> Content: " << std::endl;
     printSymbols(dr.symbols);
+
+    std::cout << std::endl << ">> Errors: " << std::endl;
+    printErrors(dr.errors);
+
+    printTypes(dr.symbols);
+
     return 0;
 }
 
@@ -241,7 +250,7 @@ void printSymbols(const std::vector<CodePoint> &symbols)
 
     for (CodePoint sym : symbols)
     {
-        if(isPrintable(sym.code))
+        if (isPrintable(sym.code))
         {
             std::cout << static_cast<char>(sym.code) << std::endl;
             continue;
@@ -249,6 +258,55 @@ void printSymbols(const std::vector<CodePoint> &symbols)
 
         std::string code = std::format("U+{:04X}", sym.code);
         std::cout << code << std::endl;
+    }
+}
+
+void printTypes(const std::vector<CodePoint> &symbols)
+{
+    int b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+
+    for (const CodePoint &codep : symbols)
+    {
+        switch (codep.type)
+        {
+        case CodePointType::ONE_BYTE:
+            b1++;
+            break;
+        case CodePointType::TWO_BYTE:
+            b2++;
+            break;
+        case CodePointType::THREE_BYTE:
+            b3++;
+            break;
+        case CodePointType::FOUR_BYTE:
+            b4++;
+            break;
+        deafult:
+            break;
+        }
+    }
+
+    int total = b1 + b2 + b3 + b4;
+
+    std::cout << std::format("\nTOTAL BYTES: {}\n", total);
+
+    std::cout << std::format("1 byte\t{}\n", b1);
+    std::cout << std::format("2 byte\t{}\n", b2);
+    std::cout << std::format("3 byte\t{}\n", b3);
+    std::cout << std::format("4 byte\t{}\n", b4);
+}
+
+void printErrors(const std::vector<Error> &errors)
+{
+    if (errors.empty())
+    {
+        std::cout << "No errors found." << std::endl;
+        return;
+    }
+
+    for (Error err : errors)
+    {
+        std::cout << std::format("[Offset: {}] what: {}\n", err.offset, err.description);
     }
 }
 
