@@ -105,7 +105,7 @@ DecodeResult Decoder::decode(const std::vector<std::uint8_t> &buffer)
         }
         else
         {
-            errors.emplace_back(offset, "byte lider invalido");
+            errors.emplace_back(offset, "byte líder inválido");
             offset += 1;
             continue;
         }
