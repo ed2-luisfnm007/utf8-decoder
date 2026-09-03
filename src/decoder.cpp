@@ -50,6 +50,13 @@ DecodeResult Decoder::decode(const std::vector<std::uint8_t> &buffer)
             }
 
             codepoint = ((b1 & 0x1F) << 6) | (b2 & 0x3F);
+
+            if (codepoint < 0x80)
+            {
+                errors.emplace_back(offset, "secuencia sobre larga");
+                offset += 2;
+                continue;
+            }
         }
         else if ((b1 & 0xF0) == 0xE0)
         {
@@ -72,10 +79,24 @@ DecodeResult Decoder::decode(const std::vector<std::uint8_t> &buffer)
             }
 
             codepoint = ((b1 & 0x0F) << 12) | ((b2 & 0x3F) << 6) | (b3 & 0x3F);
+
+            if (codepoint < 0x800)
+            {
+                errors.emplace_back(offset, "secuencia sobrelarga");
+                offset += 3;
+                continue;
+            }
         }
         else if ((b1 & 0xF8) == 0xF0)
         {
             type = CodePointType::FOUR_BYTE;
+
+            if (b1 > 0xF4)
+            {
+                errors.emplace_back(offset, "byte lider invalido");
+                offset++;
+                continue;
+            }
 
             if ((offset + 3) >= buffer.size())
             {
@@ -96,6 +117,13 @@ DecodeResult Decoder::decode(const std::vector<std::uint8_t> &buffer)
             }
 
             codepoint = ((b1 & 0x07) << 18) | ((b2 & 0x3F) << 12) | ((b3 & 0x3F) << 6) | (b4 & 0x3F);
+
+            if (codepoint < 0x10000)
+            {
+                errors.emplace_back(offset, "secuencia sobrelarga");
+                offset += 4;
+                continue;
+            }
         }
         else if (isTrailByte(b1))
         {
