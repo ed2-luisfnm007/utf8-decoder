@@ -29,3 +29,6 @@ Thumbs.db
 
 # Test file
 test-file.txt
+
+# Executable generated manually
+utf8-decoder
