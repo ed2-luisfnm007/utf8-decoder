@@ -27,8 +27,9 @@ Thumbs.db
 
 .clang-format
 
-# Test file
+# Test files
 test-file.txt
+decoder-copy.cpp
 
 # Executable generated manually
 utf8-decoder
