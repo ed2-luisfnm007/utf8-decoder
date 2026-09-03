@@ -2,7 +2,10 @@
 
 ## Instrucciones de Compilación y Ejecución
 
-Este proyecto requiere un compilador compatible con C++20.
+### Requisitos
+
+- g++ 13 o superior
+- CMake 3.20 o superior
 
 ### Opción 1: Compilar directamente con g++
 
